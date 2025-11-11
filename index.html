@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Teste de Vulnerabilidade — SENAI Taquaralto</title>
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome para Ícones -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root{
+      --bg:#0f1724; 
+      --card:#1a2332; /* Um pouco mais claro para contraste */
+      --accent:#0ea5a4; 
+      --text:#e6eef3;
+      --text-muted:#a0aec0;
+      --risk-high: #f85149;
+      --risk-medium: #fb8500;
+      --risk-low: #3fb950;
+    }
+
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Arial,sans-serif;background:linear-gradient(180deg,#071122 0%, #0b1b2b 100%);color:var(--text)}
+
+    .stage{width:100%;height:100vh;display:flex;align-items:center;justify-content:center;padding: 20px; box-sizing: border-box;}
+    
+    .slide{
+      width:100%;
+      max-width:1024px;
+      height:90vh;
+      max-height:640px;
+      background:var(--card);
+      box-shadow:0 15px 40px rgba(2,6,23,0.7);
+      border-radius:16px;
+      padding:32px;
+      box-sizing:border-box;
+      position:relative;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    header{display:flex;justify-content:space-between;align-items:center;border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 16px;}
+    header h1{font-size:22px;margin:0;font-weight: 600;}
+    header small{opacity:.7;font-size: 14px;}
+    .muted{opacity:.8;font-size:13px; color: var(--text-muted)}
+
+    .content{margin-top:20px;flex-grow:1;overflow:hidden;position:relative;}
+    .page{display:none;height:100%; opacity: 0; transition: opacity 0.4s ease-in-out; position: absolute; width: calc(100% - 64px); }
+    .page.active{display:block; opacity: 1;}
+    
+    h2{margin:0 0 16px;font-size:22px;color:var(--accent);font-weight: 600; display: flex; align-items: center; gap: 10px;}
+    ul{margin:0 0 16px 20px;line-height: 1.7;}
+    li{margin-bottom: 8px;}
+    
+    .kpi{display:grid;grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));gap:18px;}
+    .kpi .item{
+      background:linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+      padding:20px;
+      border-radius:12px;
+      border: 1px solid rgba(255,255,255,0.05);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      display: flex;
+      align-items: flex-start;
+      gap: 15px;
+    }
+    .kpi .item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    .kpi .item i { font-size: 24px; color: var(--accent); }
+    .kpi .item-content { flex-grow: 1; }
+    .kpi .item-title { font-weight: 600; font-size: 16px; margin-bottom: 5px; }
+    .kpi .item-desc { font-size: 14px; line-height: 1.5; color: var(--text-muted); }
+
+    /* Indicadores de Risco */
+    .risk-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .risk-high { background-color: var(--risk-high); }
+    .risk-medium { background-color: var(--risk-medium); }
+    .risk-low { background-color: var(--risk-low); }
+
+    footer{position:absolute;left:32px;right:32px;bottom:20px;display:flex;justify-content:space-between;align-items:center;}
+    .nav{display:flex;gap:10px;}
+    button{
+      background:var(--accent);
+      border:none;
+      color:#042f2e;
+      padding:10px 16px;
+      border-radius:8px;
+      cursor:pointer;
+      font-weight:600;
+      font-size: 14px;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+    button:hover {
+        background-color: #12b8b6;
+        transform: translateY(-2px);
+    }
+    button:active { transform: translateY(0); }
+
+    .action-plan{background:linear-gradient(90deg, rgba(14,165,164,0.1), rgba(14,165,164,0.02));padding:20px;border-radius:12px; border-left: 4px solid var(--accent);}
+    .action-plan ol { padding-left: 20px; }
+    .action-plan li {
+        margin-bottom: 16px;
+        padding-left: 10px;
+    }
+    .action-plan li::marker { font-weight: bold; color: var(--accent); }
+
+    /* Estilização da lista de vulnerabilidades */
+    .vulnerability-list {
+        background: rgba(248, 81, 73, 0.1);
+        border: 1px solid rgba(248, 81, 73, 0.3);
+        border-radius: 8px;
+        padding: 20px;
+        list-style-type: none;
+        padding-left: 0;
+    }
+    .vulnerability-list li {
+        position: relative;
+        padding-left: 30px;
+        margin-bottom: 12px;
+    }
+    .vulnerability-list li::before {
+        content: '\f071'; /* Font Awesome exclamation-triangle icon */
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        position: absolute;
+        left: 0;
+        top: 2px;
+        color: var(--risk-high);
+    }
+    
+    pre{white-space:pre-wrap;font-family:inherit; background: var(--bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 14px; line-height: 1.6;}
+    
+    @media (max-width:1100px){
+      .slide{width:95vw;height:80vh; padding: 20px;}
+      header h1{font-size: 18px;}
+      h2{font-size: 20px;}
+    }
+
+    /* --- NOVOS ESTILOS PARA A GALERIA DE IMAGENS --- */
+    #image-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .image-item {
+        position: relative;
+        width: 100%;
+        padding-bottom: 100%; /* Força uma proporção 1:1 */
+        border-radius: 8px;
+        overflow: hidden;
+        cursor: pointer;
+        background-color: var(--bg);
+        border: 1px solid rgba(255,255,255,0.05);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .image-item:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+
+    .image-item img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .delete-image-btn {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background-color: rgba(248, 81, 73, 0.8);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 28px;
+        height: 28px;
+        cursor: pointer;
+        display: none; /* Escondido por padrão */
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+    }
+
+    .image-item:hover .delete-image-btn {
+        display: flex;
+    }
+
+    /* Estilos do Modal */
+    dialog {
+        border: none;
+        border-radius: 12px;
+        padding: 0;
+        background: transparent;
+        max-width: 95%;
+        max-height: 95%;
+    }
+    
+    dialog::backdrop {
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+
+    dialog img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        border-radius: 8px;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <div class="slide" role="application" aria-label="Apresentação de vulnerabilidades">
+      <header>
+        <div>
+          <h1>Teste de Vulnerabilidade — CFP João Ribeiro</h1>
+          <small>SENAI Taquaralto • Inventário e análise rápida</small>
+        </div>
+        <div class="muted">Usuário: João Marcos • Setor: Estagiário da COPED • Data: 24/10/2025</div>
+      </header>
+
+      <div class="content">
+        <!-- Page 1: Capa / Resumo -->
+        <section class="page active" id="p1">
+          <h2><i class="fas fa-chart-line"></i> Resumo Executivo</h2>
+          <div class="kpi">
+            <div class="item">
+              <i class="fas fa-laptop"></i>
+              <div class="item-content">
+                <div class="item-title">Dispositivos</div>
+                <div class="item-desc">Desktop, Notebook e Smartphone corporativos.</div>
+              </div>
+              <div class="risk-indicator risk-medium" title="Risco Médio"></div>
+            </div>
+            <div class="item">
+              <i class="fas fa-key"></i>
+              <div class="item-content">
+                <div class="item-title">Autenticação</div>
+                <div class="item-desc">Sem biometria, reutilização de senhas, sem MFA.</div>
+              </div>
+              <div class="risk-indicator risk-high" title="Risco Alto"></div>
+            </div>
+            <div class="item">
+              <i class="fas fa-sync-alt"></i>
+              <div class="item-content">
+                <div class="item-title">Atualizações</div>
+                <div class="item-desc">Atualizações prontas, mas antivírus inativo.</div>
+              </div>
+              <div class="risk-indicator risk-medium" title="Risco Médio"></div>
+            </div>
+            <div class="item">
+              <i class="fas fa-wifi"></i>
+              <div class="item-content">
+                <div class="item-title">Rede</div>
+                <div class="item-desc">Não usa Wi-Fi público, nem VPN externa.</div>
+              </div>
+              <div class="risk-indicator risk-low" title="Risco Baixo"></div>
+            </div>
+            <div class="item">
+              <i class="fas fa-shield-alt"></i>
+              <div class="item-content">
+                <div class="item-title">Conformidade</div>
+                <div class="item-desc">Sem treinamentos recentes ou orientação LGPD.</div>
+              </div>
+              <div class="risk-indicator risk-high" title="Risco Alto"></div>
+            </div>
+          </div>
+
+          <h2 style="margin-top:24px"><i class="fas fa-exclamation-triangle"></i> Nível geral (avaliação rápida)</h2>
+          <p class="muted">Perfil com controles básicos ativos (antivírus, atualizações) porém com riscos relevantes em autenticação, falta de MFA, falta de treinamentos e presença de dados sensíveis acessíveis.</p>
+        </section>
+
+        <!-- Page 2: Dispositivos e Senhas -->
+        <section class="page" id="p2">
+          <h2><i class="fas fa-desktop"></i> Inventário de Dispositivos</h2>
+          <ul>
+            <li><strong>Dispositivos usados:</strong> Desktop corporativo; Notebook corporativo; Smartphone.</li>
+            <li><strong>Dispositivos pessoais:</strong> ocasionalmente conectados (pendrives / celulares).</li>
+            <li><strong>Desbloqueio:</strong> Sem senha/biometria no dispositivo segundo o entrevistado.</li>
+          </ul>
+
+          <h2><i class="fas fa-lock"></i> Senhas e Autenticação</h2>
+          <ul>
+            <li><strong>Reutilização de senha:</strong> Às vezes.</li>
+            <li><strong>Troca de senhas:</strong> a cada 6–12 meses.</li>
+            <li><strong>MFA (2FA):</strong> Não utiliza.</li>
+            <li><strong>Gerenciador de senhas:</strong> Não utiliza.</li>
+          </ul>
+        </section>
+
+        <!-- Page 3: Atualizações, Software e Antivírus -->
+        <section class="page" id="p3">
+          <h2><i class="fas fa-download"></i> Atualizações e Software</h2>
+          <ul>
+            <li>Instala atualizações prontamente quando solicitado pelo sistema.</li>
+            <li>Não instala software por conta própria no computador do trabalho.</li>
+            <li><strong>Antivírus corporativo inativo</strong> e sem atualização.</li>
+          </ul>
+
+          <h2><i class="fas fa-lightbulb"></i> Implicações</h2>
+          <p class="muted">Bom nível de higiene quanto a atualizações e antivírus — reduz risco de malware, mas dependência de perímetro e ausência de MFA mantêm vetores abertos.</p>
+        </section>
+
+        <!-- Page 4: Rede e Conectividade -->
+        <section class="page" id="p4">
+          <h2><i class="fas fa-network-wired"></i> Rede e Conectividade</h2>
+          <ul>
+            <li>Não usa Wi-Fi público para acessar sistemas corporativos.</li>
+            <li>Não utiliza VPN para acessar recursos da empresa fora do escritório.</li>
+            <li>Senha do Wi-Fi do escritório não é compartilhada com visitantes.</li>
+          </ul>
+
+          <h2><i class="fas fa-clipboard-check"></i> Recomendação rápida</h2>
+          <p class="muted">Política de uso de Wi-Fi e VPN adequada; manter controles de segmentação e senha por visitante se aplicável.</p>
+        </section>
+
+        <!-- Page 5: E-mail e Phishing -->
+        <section class="page" id="p5">
+          <h2><i class="fas fa-envelope"></i> E-mail e Phishing</h2>
+          <ul>
+            <li>Clique em links/anexos suspeitos: Nunca relatado.</li>
+            <li>Recebe e-mails solicitando credenciais/pagamentos: com alguma frequência segundo o usuário.</li>
+            <li>Sabe como reportar e-mails suspeitos ao time de TI/Segurança: Sim.</li>
+          </ul>
+
+          <h2><i class="fas fa-exclamation-circle"></i> Risco</h2>
+          <p class="muted">Usuário reconhece phishing e sabe reportar — ponto positivo. Ainda existe exposição por e-mails solicitando credenciais.</p>
+        </section>
+
+        <!-- Page 6: Removíveis e Impressão -->
+        <section class="page" id="p6">
+          <h2><i class="fas fa-usb"></i> Uso de Removíveis e Impressão</h2>
+          <ul>
+            <li>Uso de pendrives/HDs externos para transportar arquivos: ocasionalmente.</li>
+            <li>Deixa documentos impressos sensíveis sem controle: Nunca.</li>
+          </ul>
+
+          <h2><i class="fas fa-check-double"></i> Controle</h2>
+          <p class="muted">Boa prática com documentos impressos; revisar política de mídia removível e scan antivírus em leitura automática.</p>
+        </section>
+
+        <!-- Page 7: Privilégios e Permissões -->
+        <section class="page" id="p7">
+          <h2><i class="fas fa-user-shield"></i> Privilégios e Acesso</h2>
+          <ul>
+            <li>Conta com privilégios de administrador no computador: Não sabe .</li>
+            <li><strong>Acesso a dados sensíveis:</strong> Sim (endereços, CPF, etc.).</li>
+          </ul>
+
+          <h2><i class="fas fa-exclamation-triangle"></i> Risco</h2>
+          <p class="muted">Existência de dados sensíveis exige controles de acesso reforçados, logs e monitoração.</p>
+        </section>
+
+        <!-- Page 8: Treinamento e Incidentes -->
+        <section class="page" id="p8">
+          <h2><i class="fas fa-graduation-cap"></i> Treinamento e Conscientização</h2>
+          <ul>
+            <li><strong>Não</strong> participou de treinamentos de segurança nos últimos 12 meses.</li>
+            <li><strong>Não</strong> recebeu orientação sobre LGPD/proteção de dados.</li>
+          </ul>
+
+          <h2><i class="fas fa-history"></i> Histórico de Incidentes</h2>
+          <ul>
+            <li>Perda de dados/comprometimento/malware: Não.</li>
+            <li>Acesso físico não autorizado ao posto de trabalho: Não.</li>
+          </ul>
+        </section>
+
+        <!-- Page 9: Observações e Conclusão -->
+        <section class="page" id="p9">
+          <h2><i class="fas fa-bug"></i> Vulnerabilidades Percebidas</h2>
+          <ul class="vulnerability-list">
+            <li>Acesso a dados sensíveis por usuário sem MFA.</li>
+            <li>Reutilização de senhas ocasionais e ausência de controle de complexidade.</li>
+            <li>Antivírus inativo pode comprometer detecção de ameaças.</li>
+            <li>Falta de treinamentos e orientação LGPD eleva riscos de falhas humanas.</li>
+            <li>Dependência de autenticação simples em sistemas com dados pessoais.</li>
+          </ul>
+
+          <h2 style="margin-top: 24px;"><i class="fas fa-file-contract"></i> Conclusão</h2>
+          <p class="muted">O ambiente apresenta boas práticas básicas de atualização e uso de rede segura. Contudo, persistem vulnerabilidades humanas e de autenticação. A ausência de MFA, antivírus ativo e capacitação contínua mantém risco operacional médio a alto.</p>
+        </section>
+
+        <!-- Page 10: Plano de Ação Recomendado -->
+        <section class="page" id="p10">
+          <h2><i class="fas fa-tasks"></i> Plano de Ação Recomendado</h2>
+          <div class="action-plan">
+            <ol>
+              <li><i class="fas fa-mobile-alt"></i> <strong>Ativar MFA (2FA)</strong> em todas as contas corporativas (e-mail, sistemas e acesso remoto). <span class="muted">Prazo: 30 dias.</span></li>
+              <li><i class="fas fa-key"></i> <strong>Reforçar política de senhas</strong>: exigir complexidade mínima, não reutilização e incentivo ao uso de gerenciador. <span class="muted">Prazo: 45 dias.</span></li>
+              <li><i class="fas fa-shield-virus"></i> <strong>Reativar e atualizar o antivírus corporativo</strong>, com varredura agendada e relatórios mensais. <span class="muted">Prazo: 30 dias.</span></li>
+              <li><i class="fas fa-chalkboard-teacher"></i> <strong>Implementar treinamentos obrigatórios</strong> de segurança digital e LGPD. <span class="muted">Prazo: 60 dias.</span></li>
+              <li><i class="fas fa-hdd"></i> <strong>Aplicar controle de mídia removível</strong> e verificação automática em dispositivos externos. <span class="muted">Prazo: 60 dias.</span></li>
+              <li><i class="fas fa-lock"></i> <strong>Classificar dados sensíveis</strong> e aplicar restrições de acesso. <span class="muted">Prazo: 90 dias.</span></li>
+              <li><i class="fas fa-sync"></i> <strong>Estabelecer rotina de verificação</strong> de incidentes e campanhas internas de conscientização. <span class="muted">Prazo: contínuo.</span></li>
+            </ol>
+          </div>
+        </section>
+
+        <!-- NOVA PÁGINA 11: Galeria de Imagens -->
+        <section class="page" id="p11">
+            <h2><i class="fas fa-images"></i> Galeria de Evidências</h2>
+            <button id="add-image-btn"><i class="fas fa-plus"></i> Adicionar Imagens</button>
+            <input type="file" id="file-input" multiple accept="image/*" style="display: none;">
+            <div id="image-grid"></div>
+        </section>
+
+      </div>
+
+      <footer>
+        <div class="muted">SENAI Taquaralto — Teste de Vulnerabilidade</div>
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <div class="muted" id="page-counter">Página 1 de 11</div>
+            <div class="nav">
+                <button id="prev"><i class="fas fa-chevron-left"></i> Anterior</button>
+                <button id="next">Próxima <i class="fas fa-chevron-right"></i></button>
+                <button id="print"><i class="fas fa-file-pdf"></i> Exportar / Imprimir</button>
+            </div>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Modal para visualização de imagem -->
+  <dialog id="image-modal">
+    <img id="modal-image" src="" alt="Imagem ampliada">
+  </dialog>
+
+  <script>
+    const pages = Array.from(document.querySelectorAll('.page'));
+    const pageCounter = document.getElementById('page-counter');
+    let idx = 0;
+
+    const show = i => {
+      pages.forEach(p=>p.classList.remove('active'));
+      pages[i].classList.add('active');
+      pageCounter.textContent = `Página ${i + 1} de ${pages.length}`;
+    };
+
+    document.getElementById('next').addEventListener('click', ()=>{
+      idx = Math.min(idx+1,pages.length-1); 
+      show(idx); 
+    });
+
+    document.getElementById('prev').addEventListener('click', ()=>{
+      idx = Math.max(idx-1,0); 
+      show(idx); 
+    });
+
+    document.getElementById('print').addEventListener('click', ()=>{ 
+      window.print(); 
+    });
+
+    // --- LÓGICA DA GALERIA DE IMAGENS ---
+    const addImageBtn = document.getElementById('add-image-btn');
+    const fileInput = document.getElementById('file-input');
+    const imageGrid = document.getElementById('image-grid');
+    const imageModal = document.getElementById('image-modal');
+    const modalImage = document.getElementById('modal-image');
+
+    // Carrega imagens do localStorage ao iniciar
+    let savedImages = JSON.parse(localStorage.getItem('reportImages')) || [];
+    renderGallery();
+
+    addImageBtn.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', (event) => {
+        const files = event.target.files;
+        Array.from(files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                savedImages.push(e.target.result);
+                localStorage.setItem('reportImages', JSON.stringify(savedImages));
+                renderGallery();
+            };
+            reader.readAsDataURL(file);
+        });
+        fileInput.value = ''; // Limpa o input para permitir selecionar o mesmo arquivo novamente
+    });
+
+    function renderGallery() {
+        imageGrid.innerHTML = '';
+        if (savedImages.length === 0) {
+            imageGrid.innerHTML = '<p class="muted">Nenhuma imagem adicionada ainda. Clique no botão para adicionar.</p>';
+            return;
+        }
+        savedImages.forEach((src, index) => {
+            const item = document.createElement('div');
+            item.className = 'image-item';
+            item.innerHTML = `
+                <img src="${src}" alt="Evidência ${index + 1}">
+                <button class="delete-image-btn" title="Excluir imagem"><i class="fas fa-trash"></i></button>
+            `;
+            
+            item.querySelector('img').addEventListener('click', () => {
+                modalImage.src = src;
+                imageModal.showModal();
+            });
+
+            item.querySelector('.delete-image-btn').addEventListener('click', (e) => {
+                e.stopPropagation(); // Impede que o clique na imagem também seja acionado
+                if (confirm('Tem certeza que deseja excluir esta imagem?')) {
+                    savedImages.splice(index, 1);
+                    localStorage.setItem('reportImages', JSON.stringify(savedImages));
+                    renderGallery();
+                }
+            });
+
+            imageGrid.appendChild(item);
+        });
+    }
+
+    // Fecha o modal ao clicar na imagem (ou fora dela)
+    imageModal.addEventListener('click', () => {
+        imageModal.close();
+    });
+
+    // Inicializa o contador na primeira página
+    show(0);
+  </script>
+</body>
+</html>
