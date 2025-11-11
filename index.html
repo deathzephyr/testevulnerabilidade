@@ -148,80 +148,37 @@
       h2{font-size: 20px;}
     }
 
-    /* --- NOVOS ESTILOS PARA A GALERIA DE IMAGENS --- */
-    #image-grid {
+    /* --- ESTILOS PARA A GALERIA DE IMAGENS ESTÁTICA --- */
+    .static-image-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 15px;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
         margin-top: 20px;
     }
 
-    .image-item {
+    .static-image-item {
         position: relative;
         width: 100%;
         padding-bottom: 100%; /* Força uma proporção 1:1 */
-        border-radius: 8px;
+        border-radius: 12px;
         overflow: hidden;
-        cursor: pointer;
         background-color: var(--bg);
         border: 1px solid rgba(255,255,255,0.05);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-    .image-item:hover {
+    .static-image-item:hover {
         transform: scale(1.05);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.4);
     }
 
-    .image-item img {
+    .static-image-item img {
         position: absolute;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        object-fit: cover;
-    }
-
-    .delete-image-btn {
-        position: absolute;
-        top: 5px;
-        right: 5px;
-        background-color: rgba(248, 81, 73, 0.8);
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 28px;
-        height: 28px;
-        cursor: pointer;
-        display: none; /* Escondido por padrão */
-        align-items: center;
-        justify-content: center;
-        font-size: 14px;
-    }
-
-    .image-item:hover .delete-image-btn {
-        display: flex;
-    }
-
-    /* Estilos do Modal */
-    dialog {
-        border: none;
-        border-radius: 12px;
-        padding: 0;
-        background: transparent;
-        max-width: 95%;
-        max-height: 95%;
-    }
-    
-    dialog::backdrop {
-        background-color: rgba(0, 0, 0, 0.8);
-    }
-
-    dialog img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        border-radius: 8px;
+        object-fit: cover; /* Cobre o espaço sem distorcer */
     }
 
   </style>
@@ -415,18 +372,41 @@
           </div>
         </section>
 
-        <!-- NOVA PÁGINA 11: Galeria de Imagens -->
+        <!-- PÁGINA 11: GALERIA DE IMAGENS (ESTÁTICA) -->
         <section class="page" id="p11">
             <h2><i class="fas fa-images"></i> Galeria de Evidências</h2>
-            <button id="add-image-btn"><i class="fas fa-plus"></i> Adicionar Imagens</button>
-            <input type="file" id="file-input" multiple accept="image/*" style="display: none;">
-            <div id="image-grid"></div>
+            <div class="static-image-grid">
+                <!-- Imagem 1 -->
+                <div class="static-image-item">
+                    <img src="img1.jpeg" alt="Imagem 1">
+                </div>
+                <!-- Imagem 2 -->
+                <div class="static-image-item">
+                    <img src="img2.jpeg" alt="Imagem 2">
+                </div>
+                <!-- Imagem 3 -->
+                <div class="static-image-item">
+                    <img src="img4.jpeg" alt="Imagem 3">
+                </div>
+                <!-- Imagem 4 -->
+                <div class="static-image-item">
+                    <img src="img4.jpeg" alt="Imagem 4">
+                </div>
+                <!-- Imagem 5 -->
+                <div class="static-image-item">
+                    <img src="img5.jpeg" alt="Imagem 5">
+                </div>
+               <!-- Imagem 6 -->
+                <div class="static-image-item">
+                    <img src="img6.jpeg" alt="Imagem 6">
+                </div>
+            </div>
         </section>
 
       </div>
 
       <footer>
-        <div class="muted">SENAI Taquaralto — Teste de Vulnerabilidade</div>
+        <div class="muted"> ︎︎︎︎︎︎︎︎</div>
         <div style="display: flex; align-items: center; gap: 20px;">
             <div class="muted" id="page-counter">Página 1 de 11</div>
             <div class="nav">
@@ -438,11 +418,6 @@
       </footer>
     </div>
   </div>
-
-  <!-- Modal para visualização de imagem -->
-  <dialog id="image-modal">
-    <img id="modal-image" src="" alt="Imagem ampliada">
-  </dialog>
 
   <script>
     const pages = Array.from(document.querySelectorAll('.page'));
@@ -467,70 +442,6 @@
 
     document.getElementById('print').addEventListener('click', ()=>{ 
       window.print(); 
-    });
-
-    // --- LÓGICA DA GALERIA DE IMAGENS ---
-    const addImageBtn = document.getElementById('add-image-btn');
-    const fileInput = document.getElementById('file-input');
-    const imageGrid = document.getElementById('image-grid');
-    const imageModal = document.getElementById('image-modal');
-    const modalImage = document.getElementById('modal-image');
-
-    // Carrega imagens do localStorage ao iniciar
-    let savedImages = JSON.parse(localStorage.getItem('reportImages')) || [];
-    renderGallery();
-
-    addImageBtn.addEventListener('click', () => fileInput.click());
-
-    fileInput.addEventListener('change', (event) => {
-        const files = event.target.files;
-        Array.from(files).forEach(file => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                savedImages.push(e.target.result);
-                localStorage.setItem('reportImages', JSON.stringify(savedImages));
-                renderGallery();
-            };
-            reader.readAsDataURL(file);
-        });
-        fileInput.value = ''; // Limpa o input para permitir selecionar o mesmo arquivo novamente
-    });
-
-    function renderGallery() {
-        imageGrid.innerHTML = '';
-        if (savedImages.length === 0) {
-            imageGrid.innerHTML = '<p class="muted">Nenhuma imagem adicionada ainda. Clique no botão para adicionar.</p>';
-            return;
-        }
-        savedImages.forEach((src, index) => {
-            const item = document.createElement('div');
-            item.className = 'image-item';
-            item.innerHTML = `
-                <img src="${src}" alt="Evidência ${index + 1}">
-                <button class="delete-image-btn" title="Excluir imagem"><i class="fas fa-trash"></i></button>
-            `;
-            
-            item.querySelector('img').addEventListener('click', () => {
-                modalImage.src = src;
-                imageModal.showModal();
-            });
-
-            item.querySelector('.delete-image-btn').addEventListener('click', (e) => {
-                e.stopPropagation(); // Impede que o clique na imagem também seja acionado
-                if (confirm('Tem certeza que deseja excluir esta imagem?')) {
-                    savedImages.splice(index, 1);
-                    localStorage.setItem('reportImages', JSON.stringify(savedImages));
-                    renderGallery();
-                }
-            });
-
-            imageGrid.appendChild(item);
-        });
-    }
-
-    // Fecha o modal ao clicar na imagem (ou fora dela)
-    imageModal.addEventListener('click', () => {
-        imageModal.close();
     });
 
     // Inicializa o contador na primeira página
