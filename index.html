@@ -32,7 +32,7 @@
     
     .slide{
       width:100%;
-      max-width:1200px;
+      max-width:1200px; /* Largura máxima para telas grandes */
       height:90vh;
       max-height:680px;
       background:var(--card);
@@ -46,10 +46,49 @@
       border: 1px solid rgba(255,255,255,0.05);
     }
 
-    header{display:flex;justify-content:space-between;align-items:center;border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 16px;}
+    /* --- NOVA BARRA DE NAVEGAÇÃO NO TOPO --- */
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      flex-wrap: wrap; /* Permite quebra de linha em telas menores */
+      gap: 15px;
+    }
+    .top-nav > div:first-child {
+        flex-grow: 1; /* Faz o título ocupar o espaço disponível */
+    }
+    .top-nav > div:last-child {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap; /* Permite quebra de linha dos botões */
+    }
+    
     header h1{font-size:22px;margin:0;font-weight: 600;}
     header small{opacity:.7;font-size: 14px;}
     .muted{opacity:.8;font-size:13px; color: var(--text-muted)}
+    
+    .nav{display:flex;gap:10px; flex-wrap: wrap;}
+    button{
+      background:var(--accent);
+      border:none;
+      color:#042f2e;
+      padding:10px 16px;
+      border-radius:8px;
+      cursor:pointer;
+      font-weight:600;
+      font-size: 14px;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+      white-space: nowrap; /* Evita que o texto do botão quebre */
+    }
+    button:hover {
+        background-color: #12b8b6;
+        transform: translateY(-2px);
+    }
+    button:active { transform: translateY(0); }
 
     .content{margin-top:20px;flex-grow:1;overflow:hidden;position:relative;}
     .page{display:none;height:100%; opacity: 0; transition: opacity 0.4s ease-in-out; position: absolute; width: calc(100% - 64px); }
@@ -73,6 +112,8 @@
         border-radius: 12px;
         border: 1px solid var(--border-color);
         overflow-y: auto;
+        /* MELHORIA: Limita a largura das colunas em telões para melhor leitura */
+        max-width: 800px; 
     }
 
     .kpi{display:grid;grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));gap:12px;}
@@ -107,25 +148,8 @@
     .risk-low { background-color: var(--risk-low); }
 
     footer{position:absolute;left:32px;right:32px;bottom:20px;display:flex;justify-content:space-between;align-items:center;}
-    .nav{display:flex;gap:10px;}
-    button{
-      background:var(--accent);
-      border:none;
-      color:#042f2e;
-      padding:10px 16px;
-      border-radius:8px;
-      cursor:pointer;
-      font-weight:600;
-      font-size: 14px;
-      transition: background-color 0.2s ease, transform 0.1s ease;
-    }
-    button:hover {
-        background-color: #12b8b6;
-        transform: translateY(-2px);
-    }
-    button:active { transform: translateY(0); }
 
-    .action-plan{background:linear-gradient(90deg, rgba(14,165,164,0.1), rgba(14,165,164,0.02));padding:20px;border-radius:12px; border-left: 4px solid var(--accent);}
+    .action-plan{background:linear-gradient(90deg, rgba(14,165,164,0.1), rgba(14,165,164,0.02));padding:20px;border-radius:12px; border-left: 4px solid var(--accent); max-width: 900px; margin: 0 auto; /* Limita a largura para leitura */ }
     .action-plan ol { padding-left: 20px; }
     .action-plan li {
         margin-bottom: 16px;
@@ -157,11 +181,43 @@
         color: var(--risk-high);
     }
     
-    @media (max-width:1100px){
+    /* --- RESPONSIVIDADE --- */
+
+    /* Tablets e telas menores */
+    @media (max-width: 1100px){
       .slide{width:95vw;height:80vh; padding: 20px;}
       header h1{font-size: 18px;}
       h2{font-size: 20px;}
       .comparison-grid { grid-template-columns: 1fr; }
+      .person-column { max-width: 100%; } /* Reseta a largura máxima */
+    }
+
+    /* Celulares */
+    @media (max-width: 768px) {
+      .stage { padding: 10px; }
+      .slide { 
+        width: 98vw; 
+        height: 95vh; 
+        padding: 15px;
+        border-radius: 12px;
+      }
+      
+      /* Reorganiza a barra de navegação */
+      .top-nav {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+      .top-nav > div:first-child { text-align: center; }
+      .top-nav > div:last-child { justify-content: center; }
+      header h1 { font-size: 16px; }
+      header small { font-size: 12px; }
+      #page-counter { font-size: 12px; }
+      button { font-size: 12px; padding: 8px 12px; }
+      
+      h2 { font-size: 18px; }
+      h3 { font-size: 16px; }
+      .kpi { grid-template-columns: 1fr; }
     }
 
     .static-image-grid {
@@ -197,12 +253,21 @@
 <body>
   <div class="stage">
     <div class="slide" role="application" aria-label="Apresentação de vulnerabilidades">
-      <header>
+      <!-- Barra de navegação no topo -->
+      <div class="top-nav">
         <div>
           <h1>Teste de Vulnerabilidade — CFP João Ribeiro</h1>
           <small>SENAI Taquaralto • Análise Comparativa • Data: 24/10/2025</small>
         </div>
-      </header>
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <div class="muted" id="page-counter">Página 1 de 12</div>
+            <div class="nav">
+                <button id="prev"><i class="fas fa-chevron-left"></i> Anterior</button>
+                <button id="next">Próxima <i class="fas fa-chevron-right"></i></button>
+                <button id="print"><i class="fas fa-file-pdf"></i> Exportar / Imprimir</button>
+            </div>
+        </div>
+      </div>
 
       <div class="content">
         <!-- Page 1: Resumo Executivo Comparativo -->
@@ -489,7 +554,7 @@
         <!-- NOVA PÁGINA 11: ANÁLISE ESTRATÉGICA -->
         <section class="page" id="p11">
           <h2><i class="fas fa-brain"></i> Análise Comparativa e Recomendações Estratégicas</h2>
-          <div style="display: flex; flex-direction: column; gap: 20px; height: 100%; overflow-y: auto;">
+          <div style="display: flex; flex-direction: column; gap: 20px; height: 100%; overflow-y: auto; max-width: 900px; margin: 0 auto;">
             <div>
               <h3><i class="fas fa-exclamation-triangle" style="color: var(--risk-high);"></i> Pontos Críticos Comuns (Risco Generalizado)</h3>
               <p class="muted">As maiores vulnerabilidades da organização não estão em um único usuário, mas nas falhas compartilhadas por ambos:</p>
@@ -546,14 +611,6 @@
 
       <footer>
         <div class="muted"> ︎︎︎︎︎︎︎︎</div>
-        <div style="display: flex; align-items: center; gap: 20px;">
-            <div class="muted" id="page-counter">Página 1 de 12</div>
-            <div class="nav">
-                <button id="prev"><i class="fas fa-chevron-left"></i> Anterior</button>
-                <button id="next">Próxima <i class="fas fa-chevron-right"></i></button>
-                <button id="print"><i class="fas fa-file-pdf"></i> Exportar / Imprimir</button>
-            </div>
-        </div>
       </footer>
     </div>
   </div>
@@ -587,6 +644,3 @@
   </script>
 </body>
 </html>
-
-
-
