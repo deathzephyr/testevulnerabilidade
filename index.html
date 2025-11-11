@@ -32,7 +32,7 @@
     
     .slide{
       width:100%;
-      max-width:1200px; /* Largura máxima para telas grandes */
+      max-width:1200px;
       height:90vh;
       max-height:680px;
       background:var(--card);
@@ -54,17 +54,17 @@
       margin-bottom: 16px;
       padding-bottom: 16px;
       border-bottom: 1px solid rgba(255,255,255,0.05);
-      flex-wrap: wrap; /* Permite quebra de linha em telas menores */
+      flex-wrap: wrap;
       gap: 15px;
     }
     .top-nav > div:first-child {
-        flex-grow: 1; /* Faz o título ocupar o espaço disponível */
+        flex-grow: 1;
     }
     .top-nav > div:last-child {
         display: flex;
         align-items: center;
         gap: 20px;
-        flex-wrap: wrap; /* Permite quebra de linha dos botões */
+        flex-wrap: wrap;
     }
     
     header h1{font-size:22px;margin:0;font-weight: 600;}
@@ -82,7 +82,7 @@
       font-weight:600;
       font-size: 14px;
       transition: background-color 0.2s ease, transform 0.1s ease;
-      white-space: nowrap; /* Evita que o texto do botão quebre */
+      white-space: nowrap;
     }
     button:hover {
         background-color: #12b8b6;
@@ -112,7 +112,6 @@
         border-radius: 12px;
         border: 1px solid var(--border-color);
         overflow-y: auto;
-        /* MELHORIA: Limita a largura das colunas em telões para melhor leitura */
         max-width: 800px; 
     }
 
@@ -149,7 +148,7 @@
 
     footer{position:absolute;left:32px;right:32px;bottom:20px;display:flex;justify-content:space-between;align-items:center;}
 
-    .action-plan{background:linear-gradient(90deg, rgba(14,165,164,0.1), rgba(14,165,164,0.02));padding:20px;border-radius:12px; border-left: 4px solid var(--accent); max-width: 900px; margin: 0 auto; /* Limita a largura para leitura */ }
+    .action-plan{background:linear-gradient(90deg, rgba(14,165,164,0.1), rgba(14,165,164,0.02));padding:20px;border-radius:12px; border-left: 4px solid var(--accent); max-width: 900px; margin: 0 auto; }
     .action-plan ol { padding-left: 20px; }
     .action-plan li {
         margin-bottom: 16px;
@@ -183,13 +182,25 @@
     
     /* --- RESPONSIVIDADE --- */
 
+    /* Telões (Telas muito largas) */
+    @media (min-width: 1400px) {
+      .comparison-grid {
+        grid-template-columns: 1fr; /* Transforma em uma única coluna */
+        max-width: 900px; /* Limita a largura para leitura */
+        margin: 0 auto; /* Centraliza a coluna */
+      }
+      .person-column {
+        max-width: 100%; /* A coluna agora ocupa 100% do grid */
+      }
+    }
+
     /* Tablets e telas menores */
     @media (max-width: 1100px){
       .slide{width:95vw;height:80vh; padding: 20px;}
       header h1{font-size: 18px;}
       h2{font-size: 20px;}
       .comparison-grid { grid-template-columns: 1fr; }
-      .person-column { max-width: 100%; } /* Reseta a largura máxima */
+      .person-column { max-width: 100%; }
     }
 
     /* Celulares */
@@ -202,7 +213,6 @@
         border-radius: 12px;
       }
       
-      /* Reorganiza a barra de navegação */
       .top-nav {
         flex-direction: column;
         align-items: stretch;
@@ -253,7 +263,6 @@
 <body>
   <div class="stage">
     <div class="slide" role="application" aria-label="Apresentação de vulnerabilidades">
-      <!-- Barra de navegação no topo -->
       <div class="top-nav">
         <div>
           <h1>Teste de Vulnerabilidade — CFP João Ribeiro</h1>
@@ -274,7 +283,6 @@
         <section class="page active" id="p1">
           <h2><i class="fas fa-chart-line"></i> Resumo Executivo Comparativo</h2>
           <div class="comparison-grid">
-            <!-- Coluna João Marcos -->
             <div class="person-column">
               <h3>Membros da COPED</h3>
               <div class="kpi">
@@ -286,7 +294,6 @@
               </div>
               <p class="muted" style="margin-top: 16px;"><strong>Nível de Risco:</strong> Médio a Alto. Apresenta boas práticas básicas, mas falhas críticas em autenticação e conscientização o tornam um vetor de risco considerável.</p>
             </div>
-            <!-- Coluna Rosiana Souza Leite -->
             <div class="person-column">
               <h3>Membros da COPED</h3>
               <div class="kpi">
@@ -642,4 +649,3 @@
   </script>
 </body>
 </html>
-
