@@ -46,7 +46,6 @@
       border: 1px solid rgba(255,255,255,0.05);
     }
 
-    /* --- NOVA BARRA DE NAVEGAÇÃO NO TOPO --- */
     .top-nav {
       display: flex;
       justify-content: space-between;
@@ -90,8 +89,27 @@
     }
     button:active { transform: translateY(0); }
 
-    .content{margin-top:20px;flex-grow:1;overflow:hidden;position:relative;}
-    .page{display:none;height:100%; opacity: 0; transition: opacity 0.4s ease-in-out; position: absolute; width: calc(100% - 64px); }
+    .content{
+      margin-top:20px;
+      flex-grow:1;
+      position:relative; /* Necessário para o posicionamento absoluto das páginas */
+      /* CORREÇÃO PRINCIPAL: Removido overflow: hidden para permitir que a rolagem seja controlada pela página */
+    }
+    .page{
+      display:none; 
+      opacity: 0; 
+      transition: opacity 0.4s ease-in-out; 
+      position: absolute; 
+      top:0;
+      left:0;
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box; /* Garante que o padding não aumente o tamanho total */
+      padding-right: 10px; /* Espaço para a barra de rolagem não encostar no texto */
+
+      /* CORREÇÃO PRINCIPAL: Adicionado overflow-y: auto para criar a barra de rolagem quando necessário */
+      overflow-y: auto;
+    }
     .page.active{display:block; opacity: 1;}
     
     h2{margin:0 0 16px;font-size:22px;color:var(--accent);font-weight: 600; display: flex; align-items: center; gap: 10px;}
@@ -104,14 +122,14 @@
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 24px;
-        height: 100%;
+        height: auto; /* Alterado para auto para se ajustar ao conteúdo */
     }
     .person-column {
         background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
         padding: 20px;
         border-radius: 12px;
         border: 1px solid var(--border-color);
-        overflow-y: auto;
+        overflow-y: auto; /* Mantém a rolagem interna se uma coluna for muito longa */
         max-width: 800px; 
     }
 
@@ -185,12 +203,12 @@
     /* Telões (Telas muito largas) */
     @media (min-width: 1400px) {
       .comparison-grid {
-        grid-template-columns: 1fr; /* Transforma em uma única coluna */
-        max-width: 900px; /* Limita a largura para leitura */
-        margin: 0 auto; /* Centraliza a coluna */
+        grid-template-columns: 1fr;
+        max-width: 900px;
+        margin: 0 auto;
       }
       .person-column {
-        max-width: 100%; /* A coluna agora ocupa 100% do grid */
+        max-width: 100%;
       }
     }
 
@@ -294,9 +312,6 @@
               </div>
               <p class="muted" style="margin-top: 16px;"><strong>Nível de Risco:</strong> Médio a Alto. Apresenta boas práticas básicas, mas falhas críticas em autenticação e conscientização o tornam um vetor de risco considerável.</p>
             </div>
-            </div>
-              <p class="muted" style="margin-top: 16px;"><strong> ︎︎︎</strong> ︎︎︎︎</p>
-            </div>
             <div class="person-column">
               <h3>Membros da COPED</h3>
               <div class="kpi">
@@ -307,9 +322,6 @@
                 <div class="item"><i class="fas fa-shield-alt"></i><div class="item-content"><div class="item-title">Conformidade</div><div class="item-desc">Com treinamento, mas práticas de risco</div></div><div class="risk-indicator risk-high"></div></div>
               </div>
               <p class="muted" style="margin-top: 16px;"><strong>Nível de Risco:</strong> Alto. Apesar de ter MFA e treinamento, suas práticas (reutilização de senha, falta de atualização, cliques em phishing) e privilégios de admin representam um risco crítico e iminente.</p>
-            </div>
-           </div>
-              <p class="muted" style="margin-top: 16px;"><strong> ︎︎︎</strong> ︎︎︎︎</p>
             </div>
           </div>
         </section>
@@ -333,9 +345,6 @@
                 <li><strong>MFA:</strong> Não utiliza.</li>
                 <li><strong>Gerenciador:</strong> Não utiliza.</li>
               </ul>
-             </div>
-              <p class="muted" style="margin-top: 16px;"><strong> ︎︎︎</strong> ︎︎︎︎</p>
-            </div>
             </div>
             <div class="person-column">
               <h3>Membros da COPED</h3>
@@ -352,9 +361,6 @@
                 <li><strong>MFA:</strong> Sim, utiliza.</li>
                 <li><strong>Gerenciador:</strong> Não sabe o que é.</li>
               </ul>
-            </div>
-              <p class="muted" style="margin-top: 16px;"><strong> ︎︎︎</strong> ︎︎︎︎</p>
-            </div>
             </div>
           </div>
         </section>
@@ -373,9 +379,6 @@
               <h4><i class="fas fa-lightbulb"></i> Implicações</h4>
               <p class="muted">Bom nível de higiene com atualizações, mas o antivírus inativo é uma falha grave que anula essa proteção, expondo a malware conhecidos.</p>
             </div>
-            </div>
-              <p class="muted" style="margin-top: 16px;"><strong> ︎︎︎</strong> ︎︎︎︎</p>
-            </div>
             <div class="person-column">
               <h3>Membros da COPED</h3>
               <ul>
@@ -385,9 +388,6 @@
               </ul>
               <h4><i class="fas fa-lightbulb"></i> Implicações</h4>
               <p class="muted">Risco crítico. A falta de atualizações de sistema é uma porta de entrada aberta para atacantes, mesmo com um antivírus ativo.</p>
-            </div>
-           </div>
-              <p class="muted" style="margin-top: 16px;"><strong> ︎︎︎</strong> ︎︎︎︎</p>
             </div>
           </div>
         </section>
@@ -406,9 +406,6 @@
               <h4><i class="fas fa-clipboard-check"></i> Recomendação</h4>
               <p class="muted">Boas práticas. Manter a política de uso de rede e segmentação.</p>
             </div>
-             </div>
-              <p class="muted" style="margin-top: 16px;"><strong> ︎︎︎</strong> ︎︎︎︎</p>
-            </div>
             <div class="person-column">
               <h3>Membros da COPED</h3>
               <ul>
@@ -418,9 +415,6 @@
               </ul>
               <h4><i class="fas fa-clipboard-check"></i> Recomendação</h4>
               <p class="muted">Boas práticas. Manter a política de uso de rede e segmentação.</p>
-            </div>
-             </div>
-              <p class="muted" style="margin-top: 16px;"><strong> ︎︎︎</strong> ︎︎︎︎</p>
             </div>
           </div>
         </section>
@@ -439,9 +433,6 @@
               <h4><i class="fas fa-exclamation-circle"></i> Risco</h4>
               <p class="muted">Risco médio. Apesar de saber reportar, a alta frequência de tentativas recebidas aumenta a probabilidade de um erro futuro.</p>
             </div>
-             </div>
-              <p class="muted" style="margin-top: 16px;"><strong> ︎︎︎</strong> ︎︎︎︎</p>
-            </div>
             <div class="person-column">
               <h3>Membros da COPED</h3>
               <ul>
@@ -451,9 +442,6 @@
               </ul>
               <h4><i class="fas fa-exclamation-circle"></i> Risco</h4>
               <p class="muted">Risco crítico. A usuária já clicou em phishing e não sabe como reportar, sendo um vetor de ataque direto e eficaz.</p>
-            </div>
-             </div>
-              <p class="muted" style="margin-top: 16px;"><strong> ︎︎︎</strong> ︎︎︎︎</p>
             </div>
           </div>
         </section>
@@ -480,9 +468,6 @@
               <h4><i class="fas fa-exclamation-triangle"></i> Risco</h4>
               <p class="muted">Risco alto. O manuseio incorreto de documentos impressos e o uso de removíveis sem controle podem levar a vazamentos de dados.</p>
             </div>
-             </div>
-              <p class="muted" style="margin-top: 16px;"><strong> ︎︎︎</strong> ︎︎︎︎</p>
-            </div>
           </div>
         </section>
 
@@ -507,9 +492,6 @@
               </ul>
               <h4><i class="fas fa-exclamation-triangle"></i> Risco</h4>
               <p class="muted">Risco extremamente alto. A combinação de privilégios de admin com práticas de segurança ruins cria um cenário de comprometimento iminente.</p>
-            </div>
-             </div>
-              <p class="muted" style="margin-top: 16px;"><strong> ︎︎︎</strong> ︎︎︎︎</p>
             </div>
           </div>
         </section>
@@ -543,9 +525,6 @@
                 <li><strong>Incidentes (malware):</strong> Não.</li>
                 <li><strong>Acesso físico não autorizado:</strong> Sim.</li>
               </ul>
-               </div>
-              <p class="muted" style="margin-top: 16px;"><strong> ︎︎︎</strong> ︎︎︎︎</p>
-            </div>
             </div>
           </div>
         </section>
@@ -563,10 +542,7 @@
                 <li>Falta de treinamentos e orientação LGPD.</li>
               </ul>
               <h4><i class="fas fa-file-contract"></i> Conclusão</h4>
-              <p class="muted">O ambiente apresenta boas práticas básicas, mas persistem vulnerabilidades em autenticação e conscientização. A ausência de MFA e antivírus ativo mantém o risco operacional em médio a alto.</p>
-            </div>
-             </div>
-              <p class="muted" style="margin-top: 16px;"><strong> ︎︎︎</strong> ︎︎︎︎</p>
+              <p class="muted">O ambiente apresenta boas práticas básicas, mas persistem vulnerabilidades em autenticação e conscientização. A ausência de MFA e antivírus ativo mantém o risco operacional em médio a alto. A recomendação é focar em treinamentos contínuos e na implementação de controles técnicos fortes, como a autenticação multifator e a verificação do status do antivírus em todos os dispositivos da rede.</p>
             </div>
             <div class="person-column">
               <h3>Membros da COPED</h3>
@@ -579,10 +555,7 @@
                 <li>Histórico de acesso físico não autorizado.</li>
               </ul>
               <h4><i class="fas fa-file-contract"></i> Conclusão</h4>
-              <p class="muted">Perfil de risco extremamente alto. Apesar de treinada, suas práticas colocam a segurança em grave perigo. A combinação de fatores humanos e técnicos exige ação imediata e corretiva.</p>
-            </div>
-             </div>
-              <p class="muted" style="margin-top: 16px;"><strong> ︎︎︎</strong> ︎︎︎︎</p>
+              <p class="muted">Perfil de risco extremamente alto. Apesar de treinada, suas práticas colocam a segurança em grave perigo. A combinação de fatores humanos e técnicos exige ação imediata e corretiva. É fundamental revogar seus privilégios de administrador, forçar a atualização de seus sistemas e implementar uma política de senhas mais robusta, além de um acompanhamento de suas atividades para garantir a conformidade com as normas de segurança da informação.</p>
             </div>
           </div>
         </section>
@@ -600,9 +573,6 @@
               <li><i class="fas fa-chalkboard-teacher"></i> <strong>Capacitação Contínua e Focada:</strong> Implementar treinamentos obrigatórios periódicos, com simulações de phishing e foco nas falhas identificadas (cliques em links, manuseio de dados). <span class="muted">Prazo: 60 dias.</span></li>
               <li><i class="fas fa-file-alt"></i> <strong>Política de "Limpeza de Mesa" e Mídia Removível:</strong> Estabelecer e fiscalizar uma política para documentos impressos e controlar o uso de dispositivos USB. <span class="muted">Prazo: 90 dias.</span></li>
             </ol>
-             </div>
-              <p class="muted" style="margin-top: 16px;"><strong> ︎︎︎</strong> ︎︎︎︎</p>
-            </div>
           </div>
         </section>
 
@@ -645,9 +615,6 @@
                 <li><strong>Ação de Governança:</strong> Formalizar e comunicar políticas de segurança (acesso, mídia removível, "limpeza de mesa") para que todos entendam suas responsabilidades.</li>
                <li><strong>︎︎︎</strong>︎︎︎ ︎</li>
               </ol>
-            </div>
-             </div>
-              <p class="muted" style="margin-top: 16px;"><strong> ︎︎︎</strong> ︎︎︎︎</p>
             </div>
           </div>
         </section>
@@ -700,4 +667,3 @@
   </script>
 </body>
 </html>
-
